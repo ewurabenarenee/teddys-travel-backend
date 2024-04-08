@@ -2,6 +2,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { Document } from 'mongoose';
 import { User } from 'src/user/user.schema';
+import { Day } from './day/day.schema';
+import { Expense } from './expense/expense.schema';
 
 @Schema()
 export class Trip extends Document {
@@ -35,6 +37,18 @@ export class Trip extends Document {
   @ApiProperty({ type: User, description: 'The user who created the trip' })
   @Prop({ type: mongoose.Types.ObjectId, ref: 'User' })
   user: User;
+
+  @ApiProperty({ type: [Day], description: 'The days of the trip' })
+  @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'Day' }] })
+  days: Day[];
+
+  @ApiProperty({ type: [Expense], description: 'The expenses of the trip' })
+  @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'Expense' }] })
+  expenses: Expense[];
+
+  @ApiProperty({ example: 5000, description: 'The budget for the trip' })
+  @Prop()
+  budget: number;
 }
 
 export const TripSchema = SchemaFactory.createForClass(Trip);

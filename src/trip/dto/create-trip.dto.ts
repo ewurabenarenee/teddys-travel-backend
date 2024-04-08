@@ -24,4 +24,7 @@ export class CreateTripDto {
     description: 'Is a visa required to enter any of the places in the trip',
   })
   visaRequired: true | false;
+
+  @ApiProperty({ example: 5000, description: 'The budget for the trip' })
+  budget: number;
 }
