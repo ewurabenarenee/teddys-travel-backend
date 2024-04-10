@@ -15,6 +15,21 @@ import { ExpenseService } from './expense/expense.service';
 import { Trip } from './trip.schema';
 import { CreateActivityDto } from './day/activity/dto/create-activity.dto';
 
+function getDates(startDate: Date, endDate: Date) {
+  const dates = [];
+  let currentDate = startDate;
+  const addDays = function (days) {
+    const date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+  };
+  while (currentDate <= endDate) {
+    dates.push(currentDate);
+    currentDate = addDays.call(currentDate, 1);
+  }
+  return dates;
+}
+
 @Injectable()
 export class TripService {
   constructor(
@@ -30,7 +45,15 @@ export class TripService {
       ...createTripDto,
       user: user.sub,
     });
+
     const savedTrip = await createdTrip.save();
+
+    const dates = getDates(savedTrip.startDate, savedTrip.endDate);
+
+    for (const date of dates) {
+      this.createDay(savedTrip._id.toString(), { date: date }, user);
+    }
+
     await this.userService.addTripToUser(user.sub, savedTrip._id);
     return savedTrip;
   }
