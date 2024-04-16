@@ -49,6 +49,14 @@ export class Trip extends Document {
   @ApiProperty({ example: 5000, description: 'The budget for the trip' })
   @Prop()
   budget: number;
+
+  @ApiProperty({
+    example:
+      'https://res.cloudinary.com/example/image/upload/v1234567890/trip-image.jpg',
+    description: 'The URL of the trip image',
+  })
+  @Prop()
+  imageUrl: string;
 }
 
 export const TripSchema = SchemaFactory.createForClass(Trip);

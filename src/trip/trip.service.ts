@@ -1,9 +1,11 @@
 import {
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { UploadApiResponse } from 'cloudinary';
 import { Model } from 'mongoose';
 import { UserService } from '../user/user.service';
 import { CreateActivityDto } from './day/activity/dto/create-activity.dto';
@@ -38,6 +40,8 @@ export class TripService {
     private readonly userService: UserService,
     private readonly expenseService: ExpenseService,
     private readonly dayService: DayService,
+    @Inject('CLOUDINARY')
+    private readonly cloudinary: typeof import('cloudinary').v2,
   ) {}
 
   async create(createTripDto: CreateTripDto, user: any): Promise<Trip> {
@@ -169,5 +173,22 @@ export class TripService {
   ): Promise<void> {
     await this.getTripById(tripId, user);
     await this.dayService.removeActivity(dayId, activityId);
+  }
+
+  async updateTripImage(id: string, file, user: any): Promise<Trip> {
+    await this.getTripById(id, user);
+
+    const fileDataUri = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+
+    const result: UploadApiResponse =
+      await this.cloudinary.uploader.upload(fileDataUri);
+
+    const trip = await this.tripModel.findByIdAndUpdate(
+      id,
+      { imageUrl: result.secure_url },
+      { new: true, runValidators: true },
+    );
+
+    return trip;
   }
 }

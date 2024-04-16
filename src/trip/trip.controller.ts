@@ -7,10 +7,14 @@ import {
   Post,
   Put,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiTags,
@@ -162,5 +166,18 @@ export class TripController {
   ) {
     await this.tripService.removeActivity(tripId, dayId, activityId, req.user);
     return { message: 'Activity removed successfully' };
+  }
+
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @UseGuards(AuthGuard)
+  @Post(':id/image')
+  @UseInterceptors(FileInterceptor('file'))
+  async updateTripImage(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req,
+  ): Promise<Trip> {
+    return await this.tripService.updateTripImage(id, file, req.user);
   }
 }
