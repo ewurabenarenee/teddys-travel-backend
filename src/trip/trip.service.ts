@@ -6,6 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserService } from '../user/user.service';
+import { CreateActivityDto } from './day/activity/dto/create-activity.dto';
 import { DayService } from './day/day.service';
 import { CreateDayDto } from './day/dto/create-day.dto';
 import { CreateTripDto } from './dto/create-trip.dto';
@@ -13,7 +14,6 @@ import { UpdateTripDto } from './dto/update-trip.dto';
 import { CreateExpenseDto } from './expense/dto/create-expense.dto';
 import { ExpenseService } from './expense/expense.service';
 import { Trip } from './trip.schema';
-import { CreateActivityDto } from './day/activity/dto/create-activity.dto';
 
 function getDates(startDate: Date, endDate: Date) {
   const dates = [];
@@ -159,5 +159,15 @@ export class TripService {
   async findAllActivities(tripId: string, dayId: string, user: any) {
     await this.getTripById(tripId, user);
     return await this.dayService.findAllActivities(dayId);
+  }
+
+  async removeActivity(
+    tripId: string,
+    dayId: string,
+    activityId: string,
+    user: any,
+  ): Promise<void> {
+    await this.getTripById(tripId, user);
+    await this.dayService.removeActivity(dayId, activityId);
   }
 }

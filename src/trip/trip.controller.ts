@@ -16,13 +16,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { CreateActivityDto } from './day/activity/dto/create-activity.dto';
+import { CreateDayDto } from './day/dto/create-day.dto';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
+import { CreateExpenseDto } from './expense/dto/create-expense.dto';
 import { Trip } from './trip.schema';
 import { TripService } from './trip.service';
-import { CreateExpenseDto } from './expense/dto/create-expense.dto';
-import { CreateDayDto } from './day/dto/create-day.dto';
-import { CreateActivityDto } from './day/activity/dto/create-activity.dto';
 
 @ApiTags('trip')
 @Controller('trip')
@@ -149,5 +149,18 @@ export class TripController {
     @Request() req,
   ) {
     return await this.tripService.findAllActivities(tripId, dayId, req.user);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Delete(':tripId/day/:dayId/activity/:activityId')
+  async removeActivity(
+    @Param('tripId') tripId: string,
+    @Param('dayId') dayId: string,
+    @Param('activityId') activityId: string,
+    @Request() req,
+  ) {
+    await this.tripService.removeActivity(tripId, dayId, activityId, req.user);
+    return { message: 'Activity removed successfully' };
   }
 }
