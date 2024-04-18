@@ -15,6 +15,13 @@ export class Trip extends Document {
   name: string;
 
   @ApiProperty({
+    example: ['Amsterdam', 'Paris', 'London'],
+    description: 'An array of city names for your trip',
+  })
+  @Prop()
+  places: string[];
+
+  @ApiProperty({
     example: '2024-07-01',
     description: 'The start date of the trip',
   })

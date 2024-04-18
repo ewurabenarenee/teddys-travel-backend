@@ -8,6 +8,12 @@ export class UpdateTripDto {
   name?: string;
 
   @ApiProperty({
+    example: ['Amsterdam', 'Paris', 'London'],
+    description: 'An array of city names for your trip',
+  })
+  places?: string[];
+
+  @ApiProperty({
     example: '2024-07-01',
     description: 'The updated start date of the trip',
   })
