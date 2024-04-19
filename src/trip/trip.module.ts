@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { EmailModule } from 'src/email/email.module';
 import { UserModule } from 'src/user/user.module';
 import { DayModule } from './day/day.module';
 import { ExpenseModule } from './expense/expense.module';
@@ -15,6 +16,7 @@ import { TripService } from './trip.service';
     DayModule,
     ExpenseModule,
     CloudinaryModule,
+    EmailModule,
   ],
   controllers: [TripController],
   providers: [TripService],

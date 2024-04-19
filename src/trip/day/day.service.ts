@@ -30,7 +30,7 @@ export class DayService {
   }
 
   async findOne(id: string): Promise<Day> {
-    return await this.dayModel.findById(id).exec();
+    return await this.dayModel.findById(id).populate('activities').exec();
   }
 
   async update(id: string, updateDayDto: UpdateDayDto): Promise<Day> {

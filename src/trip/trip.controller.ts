@@ -23,6 +23,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateActivityDto } from './day/activity/dto/create-activity.dto';
 import { CreateDayDto } from './day/dto/create-day.dto';
 import { CreateTripDto } from './dto/create-trip.dto';
+import { ShareTripDto } from './dto/share-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 import { CreateExpenseDto } from './expense/dto/create-expense.dto';
 import { Trip } from './trip.schema';
@@ -179,5 +180,21 @@ export class TripController {
     @Request() req,
   ): Promise<Trip> {
     return await this.tripService.updateTripImage(id, file, req.user);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Post(':tripId/share')
+  async shareTrip(
+    @Param('tripId') tripId: string,
+    @Body() shareDto: ShareTripDto,
+    @Request() req: any,
+  ): Promise<{ message: string }> {
+    await this.tripService.shareTrip(
+      tripId,
+      shareDto.recipientName,
+      shareDto.recipientEmail,
+    );
+    return { message: 'Trip shared successfully' };
   }
 }

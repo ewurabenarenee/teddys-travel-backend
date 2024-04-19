@@ -6,7 +6,10 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UploadApiResponse } from 'cloudinary';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { Model } from 'mongoose';
+import { EmailService } from 'src/email/email.service';
 import { UserService } from '../user/user.service';
 import { CreateActivityDto } from './day/activity/dto/create-activity.dto';
 import { DayService } from './day/day.service';
@@ -42,6 +45,7 @@ export class TripService {
     private readonly dayService: DayService,
     @Inject('CLOUDINARY')
     private readonly cloudinary: typeof import('cloudinary').v2,
+    private readonly emailService: EmailService,
   ) {}
 
   async create(createTripDto: CreateTripDto, user: any): Promise<Trip> {
@@ -190,5 +194,88 @@ export class TripService {
     );
 
     return trip;
+  }
+
+  async shareTrip(
+    tripId: string,
+    recipientName: string,
+    recipientEmail: string,
+  ): Promise<void> {
+    const trip = await this.tripModel.findById(tripId).populate('days').exec();
+    if (!trip) {
+      throw new NotFoundException('Trip does not exist!');
+    }
+
+    console.log('Trip:', trip);
+    console.log('Days:', trip.days);
+
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text(`Trip Shared via Teddy's Travel: ${trip.name}`, 14, 22);
+
+    doc.setFontSize(12);
+    doc.text(`Budget: € ${trip.budget}`, 14, 32);
+
+    const sortedDays = trip.days.sort(
+      (a, b) => a.date.getTime() - b.date.getTime(),
+    );
+
+    const tableData = await Promise.all(
+      sortedDays.map(async (day) => {
+        const activities = await this.dayService.findAllActivities(
+          day._id.toString(),
+        );
+        console.log('Day:', day);
+        console.log('Activities:', activities);
+        const activitiesText = activities
+          .map((activity) => `${activity.name}: ${activity.description}`)
+          .join('\n');
+        return [day.date.toDateString(), activitiesText];
+      }),
+    );
+
+    console.log('Table Data:', tableData);
+
+    autoTable(doc, {
+      head: [['Date', 'Activities']],
+      body: tableData,
+      startY: 40,
+      styles: {
+        cellPadding: 5,
+        fontSize: 10,
+        valign: 'top',
+        overflow: 'linebreak',
+      },
+      columnStyles: {
+        0: { cellWidth: 'auto' },
+        1: { cellWidth: 120 },
+      },
+      headStyles: {
+        fillColor: [109, 35, 49],
+        textColor: [255, 255, 255],
+        halign: 'center',
+      },
+    });
+
+    // doc.save(`Trip_Details_${tripId}.pdf`);
+
+    const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
+    const subject = `Teddy's Travel Trip Details Shared with You`;
+    const content = `
+      <html>
+        <head></head>
+        <body>
+          <p>Dear ${recipientName},</p>
+          <p>A trip has been shared with you on Teddy's Travel! Please find the attached PDF with the trip details.</p>
+        </body>
+      </html>
+    `;
+    await this.emailService.sendEmailWithPdf(
+      recipientName,
+      recipientEmail,
+      subject,
+      content,
+      pdfBuffer,
+    );
   }
 }
