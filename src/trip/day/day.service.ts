@@ -89,4 +89,32 @@ export class DayService {
 
     return updatedActivity;
   }
+
+  async moveActivityUp(dayId: string, activityId: string): Promise<Day> {
+    const day = await this.dayModel.findById(dayId);
+    const activityIndex = day.activities.findIndex(
+      (activity) => activity._id.toString() === activityId,
+    );
+    if (activityIndex > 0) {
+      const tmp = day.activities[activityIndex];
+      day.activities[activityIndex] = day.activities[activityIndex - 1];
+      day.activities[activityIndex - 1] = tmp;
+      await day.save();
+    }
+    return day;
+  }
+
+  async moveActivityDown(dayId: string, activityId: string): Promise<Day> {
+    const day = await this.dayModel.findById(dayId);
+    const activityIndex = day.activities.findIndex(
+      (activity) => activity._id.toString() === activityId,
+    );
+    if (activityIndex < day.activities.length - 1) {
+      const tmp = day.activities[activityIndex];
+      day.activities[activityIndex] = day.activities[activityIndex + 1];
+      day.activities[activityIndex + 1] = tmp;
+      await day.save();
+    }
+    return day;
+  }
 }

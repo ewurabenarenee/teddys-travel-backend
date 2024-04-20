@@ -69,4 +69,20 @@ export class DayController {
       updateActivityDto,
     );
   }
+
+  @Put(':dayId/activity/:activityId/move-up')
+  async moveActivityUp(
+    @Param('dayId') dayId: string,
+    @Param('activityId') activityId: string,
+  ) {
+    return await this.dayService.moveActivityUp(dayId, activityId);
+  }
+
+  @Put(':dayId/activity/:activityId/move-down')
+  async moveActivityDown(
+    @Param('dayId') dayId: string,
+    @Param('activityId') activityId: string,
+  ) {
+    return await this.dayService.moveActivityDown(dayId, activityId);
+  }
 }
