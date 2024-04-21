@@ -184,8 +184,10 @@ export class TripService {
 
     const fileDataUri = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
 
-    const result: UploadApiResponse =
-      await this.cloudinary.uploader.upload(fileDataUri);
+    const result: UploadApiResponse = await this.cloudinary.uploader.upload(
+      fileDataUri,
+      { transformation: { width: 764, crop: 'scale' } },
+    );
 
     const trip = await this.tripModel.findByIdAndUpdate(
       id,
