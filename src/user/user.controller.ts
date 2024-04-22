@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Request,
   UnauthorizedException,
   UseGuards,
@@ -16,6 +17,7 @@ import {
 import { Public } from 'src/auth/decorators/public.decorator';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './user.schema';
 import { UserService } from './user.service';
 
@@ -48,5 +50,23 @@ export class UserController {
       throw new UnauthorizedException('User not found');
     }
     return await this.userService.findUserByEmail(email);
+  }
+
+  @Put('profile')
+  @UseGuards(AuthGuard)
+  @ApiOkResponse({
+    type: User,
+    description: "The user's profile has been successfully updated",
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async updateUser(
+    @Request() req,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<User> {
+    const userId = req.user?.sub;
+    if (!userId) {
+      throw new UnauthorizedException('User not found');
+    }
+    return await this.userService.updateUser(userId, updateUserDto);
   }
 }
