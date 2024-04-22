@@ -8,18 +8,6 @@ export class CreateUserDto {
   lastName: string;
 
   @ApiProperty({
-    example: 'Teacher',
-    description: 'The occupation of the user',
-  })
-  occupation: string;
-
-  @ApiProperty({
-    example: '+31-6543-1198',
-    description: 'The phone number of the user',
-  })
-  phone: string;
-
-  @ApiProperty({
     example: 'Sophie@hotmail.com',
     description: 'The email address of the user',
     uniqueItems: true,

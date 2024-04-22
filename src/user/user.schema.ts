@@ -14,20 +14,6 @@ export class User extends Document {
   lastName: string;
 
   @ApiProperty({
-    example: 'Teacher',
-    description: 'The occupation of the user',
-  })
-  @Prop({ required: true })
-  occupation: string;
-
-  @ApiProperty({
-    example: '+31-6543-1198',
-    description: 'The phone number of the user',
-  })
-  @Prop({ required: true })
-  phone: string;
-
-  @ApiProperty({
     example: 'Sophie@hotmail.com',
     description: 'The email address of the user',
     uniqueItems: true,
