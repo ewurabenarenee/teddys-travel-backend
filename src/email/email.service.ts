@@ -15,7 +15,7 @@ export class EmailService {
     const payload = {
       sender: {
         name: "Teddy's Travel",
-        email: 'info@teddystravel.com',
+        email: process.env.EMAIL_SENDER,
       },
       to: [
         {
