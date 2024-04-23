@@ -6,9 +6,13 @@ import {
   Put,
   Request,
   UnauthorizedException,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
+  ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiTags,
@@ -68,5 +72,25 @@ export class UserController {
       throw new UnauthorizedException('User not found');
     }
     return await this.userService.updateUser(userId, updateUserDto);
+  }
+
+  @Put('profile/picture')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse({
+    type: User,
+    description: "The user's profile picture has been successfully updated",
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async updateProfilePicture(
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<User> {
+    const userId = req.user?.sub;
+    if (!userId) {
+      throw new UnauthorizedException('User not found');
+    }
+    return await this.userService.updateProfilePicture(userId, file);
   }
 }

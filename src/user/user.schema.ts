@@ -31,6 +31,14 @@ export class User extends Document {
   @Prop({ required: true })
   password: string;
 
+  @ApiProperty({
+    example:
+      'https://res.cloudinary.com/example/image/upload/v1234567890/profile-picture.jpg',
+    description: "The URL of the user's profile picture",
+  })
+  @Prop()
+  profilePictureUrl: string;
+
   @ApiProperty({ description: 'The trips created by the user' })
   @Prop({
     type: [mongoose.Types.ObjectId],
