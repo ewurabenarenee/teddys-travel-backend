@@ -29,5 +29,3 @@ Teddy's Travel is a web application that helps you to plan and organize trips. T
 By default the service will be reachable on port 3000.
 
 To retrieve the automatically generated swagger documentation, visit `http:localhost/api`.
-
-**Please note that this is still under active development and several endpoints and features have not been implemented yet!**
